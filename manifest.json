@@ -1,0 +1,27 @@
+{
+   "background": {
+      "page": "background.htm"
+   },
+   "browser_action": {
+      "default_icon": "img/icon19.png",
+      "default_popup": "popup.htm",
+      "default_title": "Yad2 Barvaz"
+   },
+   "content_scripts": [ {
+      "js": [ "js/injected.js" ],
+      "matches": [ "<all_urls>" ]
+   } ],
+   "description": "Yad2 Auto-Refresh Monitoring",
+   "icons": {
+      "128": "img/icon128.png",
+      "16": "img/icon16.png",
+      "19": "img/icon19.png",
+      "32": "img/icon32.png",
+      "48": "img/icon48.png"
+   },
+   "manifest_version": 2,
+   "name": "Yad2 Barvaz",
+   "permissions": [ "<all_urls>", "contextMenus", "unlimitedStorage", "notifications", "tabs", "storage" ],
+   "version": "1.0",
+   "web_accessible_resources": [ "js/injected.js" ]
+}
