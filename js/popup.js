@@ -40,7 +40,7 @@ var pingTab = function() {
 	chrome.tabs.sendMessage(tabId, {pingRequest: true}, function (response) {
 		if (response === undefined ||
 		    response.pongResponse === undefined) {
-			window.alert("Cannot monitor! Please close tab and reopen.");
+			chrome.tabs.reload(tabId);
 			window.close();
 			return;
 		}
