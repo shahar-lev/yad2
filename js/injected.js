@@ -1,4 +1,8 @@
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if ("pingRequest" in request) {
+		sendResponse({pongResponse: true});
+		return;
+	}
 	if (!("extractRent" in request)) return;
 	var nodes = document.querySelectorAll('*[onclick*="NadlanID"]');
 	var urlsNow = [];

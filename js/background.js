@@ -34,9 +34,15 @@ var refreshStart = function(patron) {
 		}
 		chrome.tabs.sendMessage(patron.tabId, {extractRent: {realtors: patron.realtors}}, function (response) {
 			if (patron.tabId === undefined) return;
-			if (response === undefined) return;
+			if (response === undefined) {
+				refreshStop(patron);
+				return;
+			}
 			var extractVals = response.extractRentDone;
-			if (extractVals === undefined) return;
+			if (extractVals === undefined) {
+				refreshStop(patron);
+				return;
+			}
 			var urlsDiff = extractVals.urls.filter(function(x) { return storageUrls.indexOf(x) < 0 });
 			storageUrls = Array.from(new Set(urlsDiff)).sort().concat(storageUrls);
 			var found = false;
