@@ -1,16 +1,12 @@
 var bgPage = chrome.extension.getBackgroundPage();
-// TODO use jQuery
-var monitorElem = document.getElementById("monitorSelect");
-var realtorsElem = document.getElementById("realtorsCheckbox");
-var tabCountElem = document.getElementById("tabCount");
 var tabId = undefined;
 
 var updatePatron = function() {
 	request = {
 		type: 'monitor',
 		tabId: tabId,
-		seconds: parseInt(monitorElem.value),
-		realtors: realtorsElem.checked,
+		seconds: parseInt($("#monitorSelect").val()),
+		realtors: $("#realtorsCheckbox").prop("checked"),
 	};
 	chrome.runtime.sendMessage(request, function(response) {
 		if (response === undefined ||
@@ -20,20 +16,12 @@ var updatePatron = function() {
 	});
 };
 
-var clearNode = function(node) {
-	while (node.firstChild) {
-	    node.removeChild(node.firstChild);
-	}
-};
-
 var updatePopup = function() {
-	clearNode(tabCountElem);
-	var tabCount = Object.keys(bgPage.club).length;
-	tabCountElem.appendChild(document.createTextNode(tabCount));
+	$("#tabCount").text(Object.keys(bgPage.club).length);
 	var patron = bgPage.club[tabId];
-	monitorElem.value = patron === undefined ? 0 : patron.seconds;
+	$("#monitorSelect").val(patron === undefined ? 0 : patron.seconds);
 	if (patron !== undefined)
-		realtorsElem.checked = patron.realtors;
+		$("#realtorsCheckbox").prop("checked", patron.realtors);
 };
 
 var pingTab = function() {
@@ -45,8 +33,8 @@ var pingTab = function() {
 			return;
 		}
 		updatePopup();
-		monitorElem.addEventListener("change", updatePatron);
-		realtorsElem.addEventListener("change", updatePatron);
+		$("#monitorSelect").on("change", updatePatron);
+		$("#realtorsCheckbox").on("change", updatePatron);
 	});
 };
 
