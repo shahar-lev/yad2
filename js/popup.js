@@ -28,11 +28,17 @@ var pingTab = function() {
 	chrome.tabs.sendMessage(tabId, {pingRequest: true}, function (response) {
 		if (response === undefined ||
 		    response.pongResponse === undefined) {
-			chrome.tabs.reload(tabId);
-			window.close();
+			var errorMsg = "Cannot monitor this page! " +
+			               "You might need to reload it.";
+			$("#monitorSelect, #realtorsCheckbox")
+				.prop("disabled", true)
+				.prop("title", errorMsg);
+			$("body").append(
+				$("<div>")
+				.prop("style", "color:red")
+				.text(errorMsg));
 			return;
 		}
-		updatePopup();
 		$("#monitorSelect").on("change", updatePatron);
 		$("#realtorsCheckbox").on("change", updatePatron);
 	});
@@ -40,5 +46,6 @@ var pingTab = function() {
 
 chrome.tabs.query({currentWindow: true, active: true}, function(tabArray) {
 	tabId = tabArray[0].id;
+	updatePopup();
 	pingTab();
 });
