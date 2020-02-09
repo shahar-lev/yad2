@@ -73,7 +73,7 @@ var refreshStart = function(patron) {
 						title: 'Yad2 Barvaz',
 						message: 'New URLs Found!',
 						isClickable: true,
-					});
+					}, function(id) { console.log("Last error:", chrome.runtime.lastError); });
 				}
 				patron.handle = setTimeout(refreshStart, patron.seconds * 1000, patron);
 				console.log('Reloading tabId ' + patron.tabId + ' at ' + new Date());
