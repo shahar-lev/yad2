@@ -75,9 +75,12 @@ var refreshStart = function(patron) {
 						isClickable: true,
 					}, function(id) { console.log("Last error:", chrome.runtime.lastError); });
 				}
-				patron.handle = setTimeout(refreshStart, patron.seconds * 1000, patron);
-				console.log('Reloading tabId ' + patron.tabId + ' at ' + new Date());
-				chrome.tabs.reload(patron.tabId);
+				patron.handle = setTimeout(refreshStart, patron.seconds * 1000 / patron.factor, patron);
+				if (patron.round == 0) {
+					console.log('Reloading tabId ' + patron.tabId + ' at ' + new Date());
+					chrome.tabs.reload(patron.tabId);
+				}
+				patron.round = (patron.round + 1) % patron.factor;
 			});
 		});
 	});
@@ -105,6 +108,8 @@ var handlers = {
 		patron = {
 			tabId: request.tabId,
 			seconds: request.seconds,
+			round: 0,
+			factor: 5,
 			realtors: request.realtors,
 		};
 		club[request.tabId] = patron;
