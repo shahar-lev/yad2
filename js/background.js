@@ -13,6 +13,7 @@ var refreshStop = function(patron) {
 	patron.tabId = undefined;
 	patron.seconds = 0;
 	patron.handle = undefined;
+	patron.url = undefined;
 };
 
 var refreshStopByTabId = function(tabId) {
@@ -24,6 +25,15 @@ var refreshStopByTabId = function(tabId) {
 var storageUrls = undefined;
 var storageQueries = undefined;
 
+var refreshLoop = function(patron) {
+	patron.handle = setTimeout(refreshStart, patron.seconds * 1000 / patron.factor, patron);
+	if (patron.round == 0) {
+		console.log('Reloading tabId ' + patron.tabId + ' at ' + new Date());
+		chrome.tabs.update(patron.tabId, {url: patron.url})
+	}
+	patron.round = (patron.round + 1) % patron.factor;
+}
+
 var refreshStart = function(patron) {
 	if (patron.tabId === undefined) return;
 	chrome.tabs.get(patron.tabId, function (tab) {
@@ -32,10 +42,18 @@ var refreshStart = function(patron) {
 			refreshStop(patron);
 			return;
 		}
-		chrome.tabs.sendMessage(patron.tabId, {extractRent: {realtors: patron.realtors}}, function (response) {
+		if (patron.url === undefined) {
+			patron.url = tab.url;
+		}
+		chrome.tabs.sendMessage(patron.tabId, {extractRent: {realtors: patron.realtors, url: patron.url}}, function (response) {
 			if (patron.tabId === undefined) return;
 			if (response === undefined) {
 				refreshStop(patron);
+				return;
+			}
+			if (response.urlChanged) {
+				patron.round = 0;
+				refreshLoop(patron);
 				return;
 			}
 			var extractVals = response.extractRentDone;
@@ -75,12 +93,7 @@ var refreshStart = function(patron) {
 						isClickable: true,
 					}, function(id) { console.log("Last error:", chrome.runtime.lastError); });
 				}
-				patron.handle = setTimeout(refreshStart, patron.seconds * 1000 / patron.factor, patron);
-				if (patron.round == 0) {
-					console.log('Reloading tabId ' + patron.tabId + ' at ' + new Date());
-					chrome.tabs.reload(patron.tabId);
-				}
-				patron.round = (patron.round + 1) % patron.factor;
+				refreshLoop(patron);
 			});
 		});
 	});

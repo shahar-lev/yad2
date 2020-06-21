@@ -4,6 +4,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		return;
 	}
 	if (!("extractRent" in request)) return;
+	if (request.extractRent.url != window.location.href) {
+		sendResponse({urlChanged: true});
+		return;
+	}
 	var nodes = document.getElementsByClassName('feed_item')
 	var urlsNow = [];
 	for (var i = 0; i < nodes.length; ++i) {
